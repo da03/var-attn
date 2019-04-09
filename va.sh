@@ -54,7 +54,7 @@ train_cat_sample_b6() {
         -n_samples 1 \
         -start_decay_at 2 \
         -learning_rate_decay 0.5 \
-        -report_every 1000 | tee $name.log
+        -report_every 1000 
 }
 
 train_cat_gumbel_b6() {

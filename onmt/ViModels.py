@@ -84,11 +84,11 @@ class InferenceNetwork(nn.Module):
                 mask = mask.unsqueeze(1)
                 scores.data.masked_fill_(1-mask, self.mask_val)
             # scoresF should be softmax
-            log_scores = F.log_softmax(scores, dim=-1)
-            scores = F.softmax(scores, dim=-1)
+            log_scores = scores#F.log_softmax(scores, dim=-1)
+            scores = None#F.softmax(scores, dim=-1)
 
             # Make scores : T x N x S
-            scores = scores.transpose(0, 1)
+            #scores = scores.transpose(0, 1)
             log_scores = log_scores.transpose(0, 1)
 
             scores = Params(
@@ -185,7 +185,7 @@ class ViRNNDecoder(InputFeedRNNDecoder):
             if q_scores is not None:
                 # map over tensor-like keys
                 q_scores_i = Params(
-                    alpha=q_scores.alpha[i],
+                    alpha=None, #q_scores.alpha[i],
                     log_alpha=q_scores.log_alpha[i],
                     dist_type=q_scores.dist_type,
                 )
@@ -216,7 +216,8 @@ class ViRNNDecoder(InputFeedRNNDecoder):
                 decoder_outputs_baseline += [decoder_output_c]
             attns["std"] += [attn_c]
             if q_scores is not None:
-                attns["q"] += [q_scores.alpha[i]]
+                #attns["q"] += [q_scores.alpha[i]]
+                attns["q"] += [None]
 
             # Update the coverage attention.
             if self._coverage:
@@ -233,11 +234,13 @@ class ViRNNDecoder(InputFeedRNNDecoder):
                 attns["copy"] = attns["std"]
 
         q_info = Params(
-            alpha = q_scores.alpha,
+            #alpha = q_scores.alpha,
+            alpha = torch.stack([d.q.alpha for d in dist_infos], dim=0),
+            log_alpha = torch.stack([d.q.log_alpha for d in dist_infos], dim=0),
             dist_type = q_scores.dist_type,
             samples = torch.stack([d.q.samples for d in dist_infos], dim=0)
                 if dist_infos[0].q.samples is not None else None,
-            log_alpha = q_scores.log_alpha,
+            #log_alpha = q_scores.log_alpha,
             sample_log_probs = torch.stack([d.q.sample_log_probs for d in dist_infos], dim=0)
                 if dist_infos[0].q.sample_log_probs is not None else None,
             sample_log_probs_q = torch.stack([d.q.sample_log_probs_q for d in dist_infos], dim=0)
@@ -290,7 +293,8 @@ class ViRNNDecoder(InputFeedRNNDecoder):
         else:
             decoder_outputs_baseline = None
         for k in attns:
-            attns[k] = torch.stack(attns[k])
+            if attns[k][0] is not None:
+                attns[k] = torch.stack(attns[k])
 
         return decoder_outputs, state, attns, dist_info, decoder_outputs_baseline
 

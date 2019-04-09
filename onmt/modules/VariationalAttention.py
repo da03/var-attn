@@ -116,9 +116,9 @@ class VariationalAttention(nn.Module):
             alpha = params.alpha
             log_alpha = params.log_alpha
             K = n_samples
-            N = alpha.size(0)
-            T = alpha.size(1)
-            S = alpha.size(2)
+            N = log_alpha.size(0)
+            T = log_alpha.size(1)
+            S = log_alpha.size(2)
             attns_id = torch.distributions.categorical.Categorical(
                alpha.view(N*T, S)
             ).sample(
@@ -207,9 +207,9 @@ class VariationalAttention(nn.Module):
             input = input.unsqueeze(1)
             if q_scores is not None:
                 # oh, I guess this is super messy
-                if q_scores.alpha is not None:
+                if q_scores.log_alpha is not None:
                     q_scores = Params(
-                        alpha=q_scores.alpha.unsqueeze(1),
+                        alpha=None,
                         log_alpha=q_scores.log_alpha.unsqueeze(1),
                         dist_type=q_scores.dist_type,
                     )
@@ -259,6 +259,16 @@ class VariationalAttention(nn.Module):
         # y_align_vectors: K x N x T x S
         q_sample, p_sample, sample_log_probs = None, None, None
         sample_log_probs_q, sample_log_probs_p, sample_p_div_q_log = None, None, None
+        if q_scores is not None:
+            log_scores = F.log_softmax(q_scores.log_alpha+p_scores.log_alpha, dim=-1)
+            scores = F.softmax(q_scores.log_alpha + p_scores.log_alpha, dim=-1)
+            q_scores = Params(
+                alpha=scores,
+                log_alpha=log_scores,
+                dist_type=self.p_dist_type,
+            )
+            #q_scores._replace(log_alpha = log_scores)
+            #q_scores._replace(alpha = scores)
         if self.mode == "sample":
             if q_scores is None or self.use_prior:
                 p_sample, sample_log_probs = self.sample_attn(
@@ -324,6 +334,7 @@ class VariationalAttention(nn.Module):
 
             q_scores = Params(
                 alpha = q_scores.alpha.squeeze(1) if q_scores.alpha is not None else None,
+                log_alpha = q_scores.log_alpha.squeeze(1) if q_scores.log_alpha is not None else None,
                 dist_type = q_scores.dist_type,
                 samples = q_sample.squeeze(2) if q_sample is not None else None,
                 sample_log_probs = sample_log_probs.squeeze(2) if sample_log_probs is not None else None,
