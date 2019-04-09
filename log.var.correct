@@ -1,0 +1,478 @@
+src_word_vec_size: 512
+tgt_word_vec_size: 512
+word_vec_size: -1
+share_decoder_embeddings: False
+share_embeddings: False
+position_encoding: False
+feat_merge: concat
+feat_vec_size: -1
+feat_vec_exponent: 0.7
+model_type: text
+encoder_type: brnn
+decoder_type: rnn
+layers: -1
+enc_layers: 2
+dec_layers: 2
+memory_size: 1024
+decoder_rnn_size: 768
+attention_size: 512
+cnn_kernel_width: 3
+input_feed: 1
+bridge: False
+rnn_type: LSTM
+brnn: True
+brnn_merge: concat
+context_gate: None
+inference_network_normalization: none
+freeze_generative_model: 0
+use_generative_model: 0
+p_input_feed: mean
+mode: sample
+n_samples: 1
+k_max: 0
+train_baseline: 0
+alpha_transformation: sm
+min_clamp_val: 0.01
+p_dist_type: categorical
+q_attn_type: general
+q_dist_type: categorical
+dbg_inf: 0
+temperature: 1.0
+inference_network_type: bigbrnn
+inference_network_share_embeddings: 1
+inference_network_src_word_vec_size: 500
+inference_network_tgt_word_vec_size: 500
+inference_network_dropout: 0.3
+inference_network_src_layers: 2
+inference_network_tgt_layers: 2
+inference_network_rnn_size: 512
+global_attention: mlp
+copy_attn: False
+copy_attn_force: False
+reuse_copy_attn: False
+copy_loss_by_seqlength: False
+coverage_attn: False
+lambda_coverage: 1
+metric: ppl
+eval_only: 0
+data: data/iwslt/iwslt_125
+save_model: model_cat_sample_b6
+gpuid: [0]
+seed: 3435
+start_epoch: 1
+param_init: 0.1
+param_init_glorot: False
+train_from: 
+init_with: 
+eval_with: 
+pre_word_vecs_enc: None
+pre_word_vecs_dec: None
+fix_word_vecs_enc: False
+fix_word_vecs_dec: False
+batch_size: 6
+batch_type: sents
+normalization: sents
+accum_count: 1
+valid_batch_size: 2
+max_generator_batches: 32
+epochs: 30
+optim: adam
+adagrad_accumulator_init: 0
+max_grad_norm: 5
+dropout: 0.3
+truncated_decoder: 0
+adam_beta1: 0.9
+adam_beta2: 0.999
+adam_eps: 1e-08
+label_smoothing: 0.0
+q_warmup_start: 0.0
+q_warmup_steps: 0
+sample_kl: 0
+detach_p_kl: 0
+ignore_kl: 0
+learning_rate: 0.0003
+learning_rate_decay: 0.5
+start_decay_at: 2
+start_checkpoint_at: 0
+decay_method: 
+warmup_steps: 4000
+report_every: 1000
+exp_host: 
+exp: 
+tensorboard: False
+tensorboard_log_dir: runs/onmt
+sample_rate: 16000
+window_size: 0.02
+Loading train dataset from data/iwslt/iwslt_125.train.1.pt, number of examples: 160042
+ * vocabulary size. source = 11987; target = 8876
+Building model...
+VARIATIONAL DECODER
+Making inference network:
+    * share embeddings: True
+    * inference network type: bigbrnn
+    * inference network RNN type: LSTM
+    * inference network RNN size: 512
+    * inference network dropout: 0.3
+    * inference network src layers: 2
+    * inference network tgt layers: 2
+    * inference network alpha trans: sm
+    * inference network attn type: general
+    * inference network dist type: categorical
+    * TODO: RNN's could be possibly shared
+Intializing model parameters.
+ViNMTModel(
+  (encoder): RNNEncoder(
+    (dropout): Dropout(p=0.3)
+    (embeddings): Embeddings(
+      (make_embedding): Sequential(
+        (emb_luts): Elementwise(
+          (0): Embedding(11987, 512, padding_idx=1)
+        )
+      )
+    )
+    (rnn): LSTM(512, 512, num_layers=2, dropout=0.3, bidirectional=True)
+  )
+  (decoder): ViRNNDecoder(
+    (embeddings): Embeddings(
+      (make_embedding): Sequential(
+        (emb_luts): Elementwise(
+          (0): Embedding(8876, 512, padding_idx=1)
+        )
+      )
+    )
+    (dropout): Dropout(p=0.3)
+    (rnn): LSTM(1536, 768, num_layers=2, dropout=0.3)
+    (attn): VariationalAttention(
+      (linear_context): Linear(in_features=1024, out_features=512, bias=False)
+      (linear_query): Linear(in_features=768, out_features=512, bias=False)
+      (v): Linear(in_features=512, out_features=1, bias=False)
+      (linear_out): Linear(in_features=1792, out_features=768, bias=True)
+      (sm): Softmax()
+      (tanh): Tanh()
+    )
+  )
+  (inference_network): InferenceNetwork(
+    (src_encoder): RNNEncoder(
+      (dropout): Dropout(p=0.3)
+      (embeddings): Embeddings(
+        (make_embedding): Sequential(
+          (emb_luts): Elementwise(
+            (0): Embedding(11987, 512, padding_idx=1)
+          )
+        )
+      )
+      (rnn): LSTM(512, 512, num_layers=2, dropout=0.3, bidirectional=True)
+    )
+    (tgt_encoder): RNNEncoder(
+      (dropout): Dropout(p=0.3)
+      (embeddings): Embeddings(
+        (make_embedding): Sequential(
+          (emb_luts): Elementwise(
+            (0): Embedding(8876, 512, padding_idx=1)
+          )
+        )
+      )
+      (rnn): LSTM(512, 512, num_layers=2, dropout=0.3, bidirectional=True)
+    )
+    (W): Linear(in_features=1024, out_features=1024, bias=False)
+  )
+  (generator): Generator(
+    (proj): Linear(in_features=768, out_features=8876, bias=True)
+  )
+)
+* number of parameters: 64166316
+encoder:  37643776
+decoder:  26522540
+Making optimizer for training.
+Stage 1: Keys after executing optim.set_parameters(model.parameters())
+optim.optimizer.state_dict()['state'] keys: 
+optim.optimizer.state_dict()['param_groups'] elements: 
+optim.optimizer.state_dict()['param_groups'] element: {'lr': 0.0003, 'betas': [0.9, 0.999], 'eps': 1e-08, 'weight_decay': 0, 'amsgrad': False, 'params': [140355124402576, 140355124402864, 140355124403008, 140355124403152, 140355124403296, 140355124403440, 140355124403584, 140355124403728, 140355124403872, 140355124515248, 140355124515392, 140355124515536, 140355124515680, 140355124515824, 140355124515968, 140355124516112, 140355124516256, 140355124516832, 140355124516976, 140355124517120, 140355124517264, 140355124517408, 140355124517552, 140355124517696, 140355124517840, 140355124517984, 140355124402720, 140355124518848, 140355124588688, 140355124588832, 140355124588976, 140355124589984, 140355124590128, 140355124590272, 140355124590416, 140355124590560, 140355124590704, 140355124590848, 140355124590992, 140355124591712, 140355124591856, 140355124592000, 140355124592144, 140355124592288, 140355124592432, 140355124592576, 140355124158608, 140355124159328, 140355124159472, 140355124159616, 140355124159760, 140355124159904, 140355124160048, 140355124160192, 140355124160336, 140355124161056, 140355124161200, 140355124161344, 140355124161488, 140355124161632, 140355124161776, 140355124161920, 140355124162064, 140355124261008, 140355124589480, 140355124261152]}
+
+Start training...
+ * number of epochs: 30, starting from Epoch 1
+ * batch size: 6
+
+Loading train dataset from data/iwslt/iwslt_125.train.1.pt, number of examples: 160042
+|Param|: 483.49964451900064
+Epoch  1,  1000/26674; acc:  14.38; expelbo: 455.78; ppl: 454.37; xent:   6.12; kl:   0.00; 909 src tok/s; 929 tgt tok/s;    153 s elapsed
+|Param|: 497.5598739096633
+Epoch  1,  2000/26674; acc:  20.85; expelbo: 235.58; ppl: 234.27; xent:   5.46; kl:   0.01; 908 src tok/s; 931 tgt tok/s;    306 s elapsed
+|Param|: 508.06397234993943
+Epoch  1,  3000/26674; acc:  23.74; expelbo: 179.30; ppl: 177.37; xent:   5.18; kl:   0.01; 671 src tok/s; 692 tgt tok/s;    513 s elapsed
+|Param|: 517.3160603054964
+Epoch  1,  4000/26674; acc:  25.86; expelbo: 146.51; ppl: 144.34; xent:   4.97; kl:   0.01; 454 src tok/s; 466 tgt tok/s;    816 s elapsed
+|Param|: 526.3981382945802
+Epoch  1,  5000/26674; acc:  27.33; expelbo: 125.22; ppl: 122.85; xent:   4.81; kl:   0.02; 457 src tok/s; 470 tgt tok/s;   1121 s elapsed
+|Param|: 535.2142678404604
+Epoch  1,  6000/26674; acc:  28.67; expelbo: 111.06; ppl: 108.30; xent:   4.68; kl:   0.03; 453 src tok/s; 465 tgt tok/s;   1426 s elapsed
+|Param|: 543.2745622611094
+Epoch  1,  7000/26674; acc:  29.82; expelbo:  99.36; ppl:  96.92; xent:   4.57; kl:   0.02; 452 src tok/s; 465 tgt tok/s;   1729 s elapsed
+|Param|: 551.563317988062
+Epoch  1,  8000/26674; acc:  31.18; expelbo:  88.73; ppl:  86.02; xent:   4.45; kl:   0.03; 449 src tok/s; 462 tgt tok/s;   2031 s elapsed
+|Param|: 559.3156812123186
+Epoch  1,  9000/26674; acc:  32.11; expelbo:  82.38; ppl:  79.62; xent:   4.38; kl:   0.03; 454 src tok/s; 467 tgt tok/s;   2335 s elapsed
+|Param|: 567.0640947018247
+Epoch  1, 10000/26674; acc:  33.29; expelbo:  75.10; ppl:  72.02; xent:   4.28; kl:   0.04; 457 src tok/s; 470 tgt tok/s;   2640 s elapsed
+|Param|: 574.7295287785377
+Epoch  1, 11000/26674; acc:  34.30; expelbo:  69.42; ppl:  65.95; xent:   4.19; kl:   0.05; 455 src tok/s; 469 tgt tok/s;   2946 s elapsed
+|Param|: 581.7765625650452
+Epoch  1, 12000/26674; acc:  35.36; expelbo:  63.37; ppl:  60.17; xent:   4.10; kl:   0.05; 449 src tok/s; 464 tgt tok/s;   3248 s elapsed
+|Param|: 588.7236724474395
+Epoch  1, 13000/26674; acc:  36.14; expelbo:  59.91; ppl:  56.43; xent:   4.03; kl:   0.06; 455 src tok/s; 467 tgt tok/s;   3554 s elapsed
+|Param|: 595.3271684544558
+Epoch  1, 14000/26674; acc:  37.47; expelbo:  53.64; ppl:  50.33; xent:   3.92; kl:   0.06; 451 src tok/s; 466 tgt tok/s;   3857 s elapsed
+|Param|: 601.7197489280205
+Epoch  1, 15000/26674; acc:  38.43; expelbo:  50.38; ppl:  46.96; xent:   3.85; kl:   0.07; 455 src tok/s; 468 tgt tok/s;   4162 s elapsed
+|Param|: 607.9021559840037
+Epoch  1, 16000/26674; acc:  39.38; expelbo:  48.11; ppl:  44.53; xent:   3.80; kl:   0.08; 455 src tok/s; 467 tgt tok/s;   4466 s elapsed
+|Param|: 613.8790852032671
+Epoch  1, 17000/26674; acc:  40.43; expelbo:  44.28; ppl:  40.42; xent:   3.70; kl:   0.09; 456 src tok/s; 468 tgt tok/s;   4773 s elapsed
+|Param|: 619.5117533186921
+Epoch  1, 18000/26674; acc:  41.60; expelbo:  40.22; ppl:  36.60; xent:   3.60; kl:   0.09; 455 src tok/s; 468 tgt tok/s;   5076 s elapsed
+|Param|: 625.1200384726121
+Epoch  1, 19000/26674; acc:  42.85; expelbo:  37.58; ppl:  33.43; xent:   3.51; kl:   0.12; 454 src tok/s; 466 tgt tok/s;   5380 s elapsed
+|Param|: 630.2466035211932
+Epoch  1, 20000/26674; acc:  43.59; expelbo:  35.68; ppl:  31.61; xent:   3.45; kl:   0.12; 454 src tok/s; 468 tgt tok/s;   5687 s elapsed
+|Param|: 635.4338331014488
+Epoch  1, 21000/26674; acc:  44.70; expelbo:  33.75; ppl:  29.50; xent:   3.38; kl:   0.13; 455 src tok/s; 467 tgt tok/s;   5993 s elapsed
+|Param|: 640.4465971101728
+Epoch  1, 22000/26674; acc:  45.59; expelbo:  31.71; ppl:  27.54; xent:   3.32; kl:   0.14; 455 src tok/s; 467 tgt tok/s;   6301 s elapsed
+|Param|: 645.2403137591451
+Epoch  1, 23000/26674; acc:  46.72; expelbo:  29.60; ppl:  25.67; xent:   3.25; kl:   0.14; 449 src tok/s; 463 tgt tok/s;   6604 s elapsed
+|Param|: 650.0065143904328
+Epoch  1, 24000/26674; acc:  47.49; expelbo:  28.00; ppl:  23.97; xent:   3.18; kl:   0.16; 455 src tok/s; 466 tgt tok/s;   6907 s elapsed
+|Param|: 654.59534255905
+Epoch  1, 25000/26674; acc:  48.17; expelbo:  26.94; ppl:  22.63; xent:   3.12; kl:   0.17; 455 src tok/s; 467 tgt tok/s;   7211 s elapsed
+|Param|: 659.0998833636675
+Epoch  1, 26000/26674; acc:  49.25; expelbo:  25.01; ppl:  20.82; xent:   3.04; kl:   0.18; 451 src tok/s; 464 tgt tok/s;   7514 s elapsed
+Train exp(elbo): 62.8359
+Train perplexity: 58.1452
+Train xent: 4.06294
+Train kl: 0.0775833
+Train accuracy: 36.4369
+Loading valid dataset from data/iwslt/iwslt_125.valid.1.pt, number of examples: 7271
+switching mode to enum
+switching mode to sample
+Validation exp(elbo): 19.384
+Validation perplexity: 15.5791
+Validation xent: 2.74593
+Validation kl: 0.218519
+Validation accuracy: 54.4778
+
+Loading train dataset from data/iwslt/iwslt_125.train.1.pt, number of examples: 160042
+|Param|: 666.555019296982
+Epoch  2,  1000/26674; acc:  50.63; expelbo:  21.78; ppl:  18.12; xent:   2.90; kl:   0.18; 591 src tok/s; 609 tgt tok/s;    235 s elapsed
+|Param|: 670.8254709684181
+Epoch  2,  2000/26674; acc:  51.65; expelbo:  20.49; ppl:  16.90; xent:   2.83; kl:   0.19; 480 src tok/s; 494 tgt tok/s;    520 s elapsed
+|Param|: 675.0871934424471
+Epoch  2,  3000/26674; acc:  51.43; expelbo:  20.64; ppl:  17.03; xent:   2.83; kl:   0.19; 452 src tok/s; 468 tgt tok/s;    825 s elapsed
+|Param|: 679.1433022566004
+Epoch  2,  4000/26674; acc:  52.37; expelbo:  19.79; ppl:  16.07; xent:   2.78; kl:   0.21; 453 src tok/s; 466 tgt tok/s;   1128 s elapsed
+|Param|: 683.1405647815096
+Epoch  2,  5000/26674; acc:  52.73; expelbo:  19.23; ppl:  15.46; xent:   2.74; kl:   0.22; 456 src tok/s; 467 tgt tok/s;   1432 s elapsed
+|Param|: 687.1110263268957
+Epoch  2,  6000/26674; acc:  53.34; expelbo:  18.70; ppl:  15.06; xent:   2.71; kl:   0.22; 453 src tok/s; 465 tgt tok/s;   1734 s elapsed
+|Param|: 691.0832981631086
+Epoch  2,  7000/26674; acc:  53.66; expelbo:  18.29; ppl:  14.66; xent:   2.68; kl:   0.22; 454 src tok/s; 467 tgt tok/s;   2037 s elapsed
+|Param|: 695.0046087976683
+Epoch  2,  8000/26674; acc:  54.18; expelbo:  17.62; ppl:  13.94; xent:   2.63; kl:   0.23; 454 src tok/s; 468 tgt tok/s;   2344 s elapsed
+|Param|: 698.9058636540403
+Epoch  2,  9000/26674; acc:  53.99; expelbo:  17.94; ppl:  14.18; xent:   2.65; kl:   0.24; 455 src tok/s; 468 tgt tok/s;   2650 s elapsed
+|Param|: 702.4864767381647
+Epoch  2, 10000/26674; acc:  54.68; expelbo:  17.40; ppl:  13.65; xent:   2.61; kl:   0.24; 452 src tok/s; 465 tgt tok/s;   2956 s elapsed
+|Param|: 706.1460100432488
+Epoch  2, 11000/26674; acc:  54.94; expelbo:  16.68; ppl:  13.22; xent:   2.58; kl:   0.23; 453 src tok/s; 467 tgt tok/s;   3260 s elapsed
+|Param|: 709.9159941500121
+Epoch  2, 12000/26674; acc:  55.31; expelbo:  16.35; ppl:  12.86; xent:   2.55; kl:   0.24; 454 src tok/s; 468 tgt tok/s;   3562 s elapsed
+|Param|: 713.5777594278005
+Epoch  2, 13000/26674; acc:  55.69; expelbo:  16.16; ppl:  12.64; xent:   2.54; kl:   0.25; 453 src tok/s; 467 tgt tok/s;   3864 s elapsed
+|Param|: 717.2221151777181
+Epoch  2, 14000/26674; acc:  55.96; expelbo:  15.82; ppl:  12.23; xent:   2.50; kl:   0.26; 453 src tok/s; 465 tgt tok/s;   4169 s elapsed
+|Param|: 720.6593768903587
+Epoch  2, 15000/26674; acc:  56.35; expelbo:  15.37; ppl:  11.86; xent:   2.47; kl:   0.26; 452 src tok/s; 464 tgt tok/s;   4470 s elapsed
+|Param|: 724.3871116329997
+Epoch  2, 16000/26674; acc:  56.58; expelbo:  15.27; ppl:  11.76; xent:   2.47; kl:   0.26; 453 src tok/s; 468 tgt tok/s;   4776 s elapsed
+|Param|: 727.7692371212182
+Epoch  2, 17000/26674; acc:  56.83; expelbo:  14.97; ppl:  11.34; xent:   2.43; kl:   0.28; 455 src tok/s; 468 tgt tok/s;   5082 s elapsed
+|Param|: 731.0251363667326
+Epoch  2, 18000/26674; acc:  57.47; expelbo:  14.40; ppl:  10.96; xent:   2.39; kl:   0.27; 454 src tok/s; 466 tgt tok/s;   5387 s elapsed
+|Param|: 734.2242079228932
+Epoch  2, 19000/26674; acc:  57.12; expelbo:  14.56; ppl:  11.17; xent:   2.41; kl:   0.26; 454 src tok/s; 467 tgt tok/s;   5691 s elapsed
+|Param|: 737.5693187762083
+Epoch  2, 20000/26674; acc:  57.49; expelbo:  14.37; ppl:  10.96; xent:   2.39; kl:   0.27; 455 src tok/s; 465 tgt tok/s;   5992 s elapsed
+|Param|: 741.0961476083924
+Epoch  2, 21000/26674; acc:  57.47; expelbo:  14.33; ppl:  10.84; xent:   2.38; kl:   0.28; 452 src tok/s; 465 tgt tok/s;   6296 s elapsed
+|Param|: 744.3515214601231
+Epoch  2, 22000/26674; acc:  57.66; expelbo:  14.14; ppl:  10.65; xent:   2.37; kl:   0.28; 453 src tok/s; 467 tgt tok/s;   6601 s elapsed
+|Param|: 747.4827339143026
+Epoch  2, 23000/26674; acc:  57.94; expelbo:  13.89; ppl:  10.39; xent:   2.34; kl:   0.29; 452 src tok/s; 466 tgt tok/s;   6907 s elapsed
+|Param|: 750.6918475646315
+Epoch  2, 24000/26674; acc:  58.36; expelbo:  13.48; ppl:  10.21; xent:   2.32; kl:   0.28; 455 src tok/s; 468 tgt tok/s;   7212 s elapsed
+|Param|: 753.7393034066885
+Epoch  2, 25000/26674; acc:  58.62; expelbo:  13.56; ppl:  10.11; xent:   2.31; kl:   0.29; 452 src tok/s; 467 tgt tok/s;   7518 s elapsed
+|Param|: 756.8350216526717
+Epoch  2, 26000/26674; acc:  58.63; expelbo:  13.34; ppl:   9.99; xent:   2.30; kl:   0.29; 455 src tok/s; 467 tgt tok/s;   7826 s elapsed
+Train exp(elbo): 16.215
+Train perplexity: 12.6406
+Train xent: 2.53691
+Train kl: 0.249022
+Train accuracy: 55.5156
+Loading valid dataset from data/iwslt/iwslt_125.valid.1.pt, number of examples: 7271
+switching mode to enum
+switching mode to sample
+Validation exp(elbo): 10.883
+Validation perplexity: 8.28507
+Validation xent: 2.11446
+Validation kl: 0.272745
+Validation accuracy: 62.7009
+
+Loading train dataset from data/iwslt/iwslt_125.train.1.pt, number of examples: 160042
+|Param|: 762.261807058441
+Epoch  3,  1000/26674; acc:  60.38; expelbo:  11.18; ppl:   8.50; xent:   2.14; kl:   0.27; 453 src tok/s; 465 tgt tok/s;    306 s elapsed
+|Param|: 765.5477205896442
+Epoch  3,  2000/26674; acc:  60.16; expelbo:  11.48; ppl:   8.71; xent:   2.16; kl:   0.28; 454 src tok/s; 466 tgt tok/s;    611 s elapsed
+|Param|: 768.6816636293596
+Epoch  3,  3000/26674; acc:  59.99; expelbo:  11.41; ppl:   8.76; xent:   2.17; kl:   0.26; 452 src tok/s; 463 tgt tok/s;    912 s elapsed
+|Param|: 771.5569081409355
+Epoch  3,  4000/26674; acc:  59.85; expelbo:  11.69; ppl:   8.89; xent:   2.19; kl:   0.27; 456 src tok/s; 467 tgt tok/s;   1221 s elapsed
+|Param|: 774.5517655392698
+Epoch  3,  5000/26674; acc:  60.28; expelbo:  11.29; ppl:   8.66; xent:   2.16; kl:   0.26; 452 src tok/s; 464 tgt tok/s;   1522 s elapsed
+|Param|: 777.5876156421217
+Epoch  3,  6000/26674; acc:  60.21; expelbo:  11.21; ppl:   8.62; xent:   2.15; kl:   0.26; 451 src tok/s; 465 tgt tok/s;   1826 s elapsed
+|Param|: 780.7408340800422
+Epoch  3,  7000/26674; acc:  60.16; expelbo:  11.33; ppl:   8.72; xent:   2.17; kl:   0.26; 454 src tok/s; 467 tgt tok/s;   2133 s elapsed
+|Param|: 783.8761860140924
+Epoch  3,  8000/26674; acc:  60.06; expelbo:  11.30; ppl:   8.67; xent:   2.16; kl:   0.26; 451 src tok/s; 465 tgt tok/s;   2439 s elapsed
+|Param|: 786.8907563950665
+Epoch  3,  9000/26674; acc:  60.58; expelbo:  10.88; ppl:   8.39; xent:   2.13; kl:   0.26; 451 src tok/s; 463 tgt tok/s;   2741 s elapsed
+|Param|: 789.7893310877274
+Epoch  3, 10000/26674; acc:  60.72; expelbo:  10.94; ppl:   8.33; xent:   2.12; kl:   0.27; 453 src tok/s; 465 tgt tok/s;   3045 s elapsed
+|Param|: 792.8157099856182
+Epoch  3, 11000/26674; acc:  61.05; expelbo:  10.67; ppl:   8.22; xent:   2.11; kl:   0.26; 453 src tok/s; 466 tgt tok/s;   3349 s elapsed
+|Param|: 795.64576760013
+Epoch  3, 12000/26674; acc:  60.86; expelbo:  10.66; ppl:   8.25; xent:   2.11; kl:   0.26; 452 src tok/s; 466 tgt tok/s;   3650 s elapsed
+|Param|: 798.7198742362682
+Epoch  3, 13000/26674; acc:  60.86; expelbo:  11.02; ppl:   8.33; xent:   2.12; kl:   0.28; 455 src tok/s; 469 tgt tok/s;   3956 s elapsed
+|Param|: 801.5554020153567
+Epoch  3, 14000/26674; acc:  61.01; expelbo:  10.72; ppl:   8.19; xent:   2.10; kl:   0.27; 452 src tok/s; 466 tgt tok/s;   4261 s elapsed
+|Param|: 804.5873554189128
+Epoch  3, 15000/26674; acc:  61.16; expelbo:  10.66; ppl:   8.13; xent:   2.10; kl:   0.27; 453 src tok/s; 466 tgt tok/s;   4567 s elapsed
+|Param|: 807.4577001304774
+Epoch  3, 16000/26674; acc:  61.06; expelbo:  10.73; ppl:   8.22; xent:   2.11; kl:   0.27; 458 src tok/s; 469 tgt tok/s;   4873 s elapsed
+|Param|: 810.3237778814096
+Epoch  3, 17000/26674; acc:  61.09; expelbo:  10.69; ppl:   8.16; xent:   2.10; kl:   0.27; 453 src tok/s; 465 tgt tok/s;   5177 s elapsed
+|Param|: 813.189399832536
+Epoch  3, 18000/26674; acc:  61.31; expelbo:  10.41; ppl:   8.00; xent:   2.08; kl:   0.26; 453 src tok/s; 466 tgt tok/s;   5480 s elapsed
+|Param|: 816.0163907667542
+Epoch  3, 19000/26674; acc:  61.86; expelbo:  10.14; ppl:   7.70; xent:   2.04; kl:   0.28; 455 src tok/s; 467 tgt tok/s;   5786 s elapsed
+|Param|: 818.7659540430342
+Epoch  3, 20000/26674; acc:  61.37; expelbo:  10.39; ppl:   7.94; xent:   2.07; kl:   0.27; 452 src tok/s; 466 tgt tok/s;   6090 s elapsed
+|Param|: 821.5337789768598
+Epoch  3, 21000/26674; acc:  61.28; expelbo:  10.25; ppl:   7.88; xent:   2.06; kl:   0.26; 451 src tok/s; 466 tgt tok/s;   6396 s elapsed
+|Param|: 824.4247236709972
+Epoch  3, 22000/26674; acc:  61.43; expelbo:  10.51; ppl:   7.95; xent:   2.07; kl:   0.28; 456 src tok/s; 468 tgt tok/s;   6703 s elapsed
+|Param|: 827.0021538666027
+Epoch  3, 23000/26674; acc:  61.57; expelbo:  10.23; ppl:   7.82; xent:   2.06; kl:   0.27; 454 src tok/s; 467 tgt tok/s;   7007 s elapsed
+|Param|: 829.7591518024974
+Epoch  3, 24000/26674; acc:  61.77; expelbo:  10.17; ppl:   7.78; xent:   2.05; kl:   0.27; 452 src tok/s; 466 tgt tok/s;   7311 s elapsed
+|Param|: 832.5973666785164
+Epoch  3, 25000/26674; acc:  61.53; expelbo:  10.36; ppl:   7.86; xent:   2.06; kl:   0.28; 455 src tok/s; 468 tgt tok/s;   7616 s elapsed
+|Param|: 835.2321533561792
+Epoch  3, 26000/26674; acc:  61.92; expelbo:  10.11; ppl:   7.73; xent:   2.05; kl:   0.27; 566 src tok/s; 583 tgt tok/s;   7861 s elapsed
+Train exp(elbo): 10.7645
+Train perplexity: 8.22695
+Train xent: 2.10741
+Train kl: 0.268834
+Train accuracy: 60.927
+Loading valid dataset from data/iwslt/iwslt_125.valid.1.pt, number of examples: 7271
+switching mode to enum
+switching mode to sample
+Validation exp(elbo): 8.92875
+Validation perplexity: 6.86767
+Validation xent: 1.92682
+Validation kl: 0.262452
+Validation accuracy: 65.0071
+
+Loading train dataset from data/iwslt/iwslt_125.train.1.pt, number of examples: 160042
+|Param|: 839.817353654948
+Epoch  4,  1000/26674; acc:  63.37; expelbo:   8.66; ppl:   6.74; xent:   1.91; kl:   0.25; 452 src tok/s; 465 tgt tok/s;    304 s elapsed
+|Param|: 842.6134938392572
+Epoch  4,  2000/26674; acc:  63.46; expelbo:   8.60; ppl:   6.76; xent:   1.91; kl:   0.24; 453 src tok/s; 466 tgt tok/s;    608 s elapsed
+|Param|: 845.543353412467
+Epoch  4,  3000/26674; acc:  63.31; expelbo:   8.82; ppl:   6.86; xent:   1.93; kl:   0.25; 453 src tok/s; 467 tgt tok/s;    913 s elapsed
+|Param|: 848.3048906495824
+Epoch  4,  4000/26674; acc:  63.05; expelbo:   8.93; ppl:   6.96; xent:   1.94; kl:   0.25; 452 src tok/s; 465 tgt tok/s;   1217 s elapsed
+|Param|: 851.1669930160591
+Epoch  4,  5000/26674; acc:  63.33; expelbo:   8.72; ppl:   6.74; xent:   1.91; kl:   0.26; 453 src tok/s; 466 tgt tok/s;   1520 s elapsed
+|Param|: 853.6913596259482
+Epoch  4,  6000/26674; acc:  62.95; expelbo:   8.97; ppl:   6.99; xent:   1.94; kl:   0.25; 455 src tok/s; 468 tgt tok/s;   1827 s elapsed
+|Param|: 856.4727082633749
+Epoch  4,  7000/26674; acc:  63.10; expelbo:   8.92; ppl:   6.91; xent:   1.93; kl:   0.26; 451 src tok/s; 464 tgt tok/s;   2131 s elapsed
+|Param|: 859.0232461930236
+Epoch  4,  8000/26674; acc:  63.19; expelbo:   8.89; ppl:   6.92; xent:   1.93; kl:   0.25; 454 src tok/s; 468 tgt tok/s;   2435 s elapsed
+|Param|: 861.858565833165
+Epoch  4,  9000/26674; acc:  63.15; expelbo:   8.95; ppl:   6.91; xent:   1.93; kl:   0.26; 454 src tok/s; 468 tgt tok/s;   2741 s elapsed
+|Param|: 864.6411466614344
+Epoch  4, 10000/26674; acc:  63.38; expelbo:   8.79; ppl:   6.82; xent:   1.92; kl:   0.25; 453 src tok/s; 467 tgt tok/s;   3046 s elapsed
+|Param|: 867.1974976901167
+Epoch  4, 11000/26674; acc:  63.36; expelbo:   8.64; ppl:   6.75; xent:   1.91; kl:   0.25; 451 src tok/s; 463 tgt tok/s;   3348 s elapsed
+|Param|: 869.6560383277978
+Epoch  4, 12000/26674; acc:  62.98; expelbo:   8.89; ppl:   6.90; xent:   1.93; kl:   0.25; 454 src tok/s; 466 tgt tok/s;   3654 s elapsed
+|Param|: 872.1655519452714
+Epoch  4, 13000/26674; acc:  63.07; expelbo:   8.90; ppl:   6.96; xent:   1.94; kl:   0.25; 451 src tok/s; 466 tgt tok/s;   3959 s elapsed
+|Param|: 874.8327340126226
+Epoch  4, 14000/26674; acc:  62.95; expelbo:   9.04; ppl:   7.01; xent:   1.95; kl:   0.25; 454 src tok/s; 466 tgt tok/s;   4265 s elapsed
+|Param|: 877.4792020327319
+Epoch  4, 15000/26674; acc:  62.85; expelbo:   8.99; ppl:   7.00; xent:   1.95; kl:   0.25; 451 src tok/s; 466 tgt tok/s;   4572 s elapsed
+|Param|: 879.945168746326
+Epoch  4, 16000/26674; acc:  63.61; expelbo:   8.67; ppl:   6.74; xent:   1.91; kl:   0.25; 449 src tok/s; 463 tgt tok/s;   4876 s elapsed
+|Param|: 882.4343459997464
+Epoch  4, 17000/26674; acc:  63.58; expelbo:   8.77; ppl:   6.79; xent:   1.92; kl:   0.26; 455 src tok/s; 468 tgt tok/s;   5183 s elapsed
+|Param|: 884.954483292785
+Epoch  4, 18000/26674; acc:  63.89; expelbo:   8.51; ppl:   6.60; xent:   1.89; kl:   0.25; 452 src tok/s; 466 tgt tok/s;   5488 s elapsed
+|Param|: 887.5383442420953
+Epoch  4, 19000/26674; acc:  63.84; expelbo:   8.67; ppl:   6.69; xent:   1.90; kl:   0.26; 455 src tok/s; 467 tgt tok/s;   5795 s elapsed
+|Param|: 890.0031952189835
+Epoch  4, 20000/26674; acc:  63.74; expelbo:   8.68; ppl:   6.70; xent:   1.90; kl:   0.26; 454 src tok/s; 466 tgt tok/s;   6100 s elapsed
+|Param|: 892.4963235218395
+Epoch  4, 21000/26674; acc:  63.56; expelbo:   8.74; ppl:   6.71; xent:   1.90; kl:   0.26; 452 src tok/s; 465 tgt tok/s;   6402 s elapsed
+|Param|: 894.9097021487698
+Epoch  4, 22000/26674; acc:  63.50; expelbo:   8.76; ppl:   6.76; xent:   1.91; kl:   0.26; 454 src tok/s; 466 tgt tok/s;   6709 s elapsed
+|Param|: 897.3753047081249
+Epoch  4, 23000/26674; acc:  63.95; expelbo:   8.51; ppl:   6.57; xent:   1.88; kl:   0.26; 452 src tok/s; 466 tgt tok/s;   7012 s elapsed
+|Param|: 899.8042148156453
+Epoch  4, 24000/26674; acc:  63.62; expelbo:   8.69; ppl:   6.70; xent:   1.90; kl:   0.26; 486 src tok/s; 499 tgt tok/s;   7297 s elapsed
+|Param|: 902.2787471175412
+Epoch  4, 25000/26674; acc:  63.57; expelbo:   8.72; ppl:   6.73; xent:   1.91; kl:   0.26; 592 src tok/s; 608 tgt tok/s;   7532 s elapsed
+|Param|: 904.6814701871593
+Epoch  4, 26000/26674; acc:  63.76; expelbo:   8.66; ppl:   6.70; xent:   1.90; kl:   0.26; 486 src tok/s; 498 tgt tok/s;   7818 s elapsed
+Train exp(elbo): 8.76903
+Train perplexity: 6.79838
+Train xent: 1.91668
+Train kl: 0.254542
+Train accuracy: 63.4085
+Loading valid dataset from data/iwslt/iwslt_125.valid.1.pt, number of examples: 7271
+switching mode to enum
+switching mode to sample
+Validation exp(elbo): 7.9437
+Validation perplexity: 6.10603
+Validation xent: 1.80928
+Validation kl: 0.263103
+Validation accuracy: 66.8395
+
+Loading train dataset from data/iwslt/iwslt_125.train.1.pt, number of examples: 160042
+|Param|: 908.9042853898313
+Epoch  5,  1000/26674; acc:  65.65; expelbo:   7.25; ppl:   5.70; xent:   1.74; kl:   0.24; 449 src tok/s; 462 tgt tok/s;    303 s elapsed
+|Param|: 911.4107539962429
+Epoch  5,  2000/26674; acc:  65.35; expelbo:   7.46; ppl:   5.85; xent:   1.77; kl:   0.24; 450 src tok/s; 465 tgt tok/s;    608 s elapsed
+|Param|: 913.9635523367439
+Epoch  5,  3000/26674; acc:  65.53; expelbo:   7.39; ppl:   5.81; xent:   1.76; kl:   0.24; 453 src tok/s; 465 tgt tok/s;    914 s elapsed
+|Param|: 916.4794392129046
+Epoch  5,  4000/26674; acc:  65.11; expelbo:   7.59; ppl:   6.00; xent:   1.79; kl:   0.24; 454 src tok/s; 467 tgt tok/s;   1222 s elapsed
+|Param|: 918.9596359470855
+Epoch  5,  5000/26674; acc:  65.18; expelbo:   7.58; ppl:   5.98; xent:   1.79; kl:   0.24; 454 src tok/s; 467 tgt tok/s;   1525 s elapsed
+|Param|: 921.4379726818295
+Epoch  5,  6000/26674; acc:  65.09; expelbo:   7.71; ppl:   6.05; xent:   1.80; kl:   0.24; 454 src tok/s; 466 tgt tok/s;   1831 s elapsed
+|Param|: 923.9863702999087
+Epoch  5,  7000/26674; acc:  64.96; expelbo:   7.76; ppl:   6.10; xent:   1.81; kl:   0.24; 454 src tok/s; 466 tgt tok/s;   2138 s elapsed
